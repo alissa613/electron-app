@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap CSS -->
+  <link href="assets\css\bootstrap.min.css" rel="stylesheet" />
+  <link href="assets\css\styles.css" rel="stylesheet" />
+  <script>
+    window.$ = window.jQuery = require("./assets/js/jquery-3.6.0.min.js");
+  </script>
+
+  <title>TEST Bookstore</title>
+</head>
+
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid pr-0 mr-0" style="padding-right:0">
+      <div class="row w-100 pr-0 mr-0" style="padding-right:0">
+        <div class="col-4 d-flex justify-content-start align-items-center">
+          <button type="button" class="btn btn-primary" style="margin-right: 5px; margin-left:5px;" onclick="alert('Hello World!')">Bookstore</button>
+          <button type="button" class="btn btn-primary" style="margin-right: 5px; margin-left:10px;" onclick="alert('Goodbye World!')">New Tab</button>
+        </div>
+        <div class="col-8 pr-0 mr-0- d-flex justify-content-end" style="padding-right:0">
+          <div data-bs-toggle="tooltip" data-bs-placement="bottom" title="Refresh Books">
+            <a href="#" id="refresh">
+              <img class="navIcon" src="assets\\icons\\arrow-clockwise.svg" /></a>
+          </div>
+          <div class="mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add Book">
+            <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              <img class="navIcon" src="assets\\icons\\plus.svg" /></a>
+            </a>
+          </div>
+          <div data-bs-toggle="tooltip" data-bs-placement="bottom" title="Log Out">
+            <a href="login.html">
+              <img class="navIcon" src="assets\\icons\\lock.svg" /></a>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container-flex">
+    <div class="row my-3 d-flex justify-content-center align-items-center">
+      <div class="col-10">
+        <input type="input" class="form-control input-lg" id="txt-search" placeholder="Search for Books" />
+
+      </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div id="spinner" class="w-100 h-75 row align-items-center">
+      <div class="d-flex justify-content-center flex-row">
+        <div class="d-flex justify-content center align-items-center flex-column">
+          <div class="spinner-border" role="status">
+            <span class="sr-only"></span>
+          </div>
+          <div class="my-3"><strong>Loading...</strong></div>
+        </div>
+      </div>
+    </div>
+    <div id="hide-on-start" style="display:none">
+      <div class="container-flex d-flex justify-content-center flex-column align-items-center">
+        <div class="row p-0 m-0 h-100 w-100 justify-content-center flex-row align-items-center" id="bookList"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!--
+
+Modals
+
+-->
+
+  <!-- Add Book Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Book</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label for="inputBookName" class="form-label">Book Name</label>
+            <input type="text" id="inputBookName" placeholder="Book Name" class="form-control" /></div>
+          <div class="mb-3"><label for="inputBookAuthor" class="form-label">Author</label>
+            <input type="text" id="inputBookAuthor" placeholder="Author" class="form-control" /></div>
+          <div class="mb-3"><label for="inputBookImage" class="form-label">Image URL</label>
+            <input type="text" id="inputBookImage" placeholder="Image URL" class="form-control" /></div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close
+          </button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="btnAdd">
+            Save changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Edit Book Modal -->
+  <div class="modal fade" id="modalEditBook" tabindex="-1" aria-labelledby="modalEditBook" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalEditBookLabel">Edit Book</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label for="inputEditBookName" class="form-label">Book Name</label>
+            <input type="text" id="inputEditBookName" placeholder="Book Name" class="form-control" /></div>
+          <div class="mb-3"><label for="inputEditBookAuthor" class="form-label">Author</label>
+            <input type="text" id="inputEditBookAuthor" placeholder="Author" class="form-control" /></div>
+          <div class="mb-3"><label for="inputEditBookImage" class="form-label">Image URL</label>
+            <input type="text" id="inputEditBookImage" placeholder="Image URL" class="form-control" /></div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close
+          </button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="btnSaveEdit">
+            Save changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="assets\js\bootstrap.bundle.min.js"></script>
+  <script>
+    //Required electron includes
+    const electron = require("electron");
+    const { ipcRenderer } = electron;
+
+    //Initialize empty object to store items - used for live search
+    var savedList = {};
+    //Stores the ID of the selected book
+    var selectedID = "";
+
+    //Generates html for cards for the books
+    function returnBookRow(bookName, bookAuthor, bookImage, bookID) {
+      return `     
+        <div class="card col-xs-10 col-sm-10 col-md-4 col-lg-3 col-xl-2 mb-3 mx-3 bookItem" id="${bookID}" style="height:300px;">
+            <div class="d-flex justify-content-center align-items-center pt-2"><img src="${bookImage}" class="card-img-top" style="width:150px;height:auto;" alt="..."></div>
+
+              <div class="card-body d-flex flex-column justify-content-around">
+                <div class="row d-flex justify-content-center"><div class="col-10 text-center"><h4 class="justify-content-center card-title row">${bookName}</h4></div></div>
+                <div class="row d-flex justify-content-center">
+                  <div class="col-8 p-0 m-0 d-flex justify-content-start align-items-center">
+                    <p class="card-text p-0 m-0">${bookAuthor}</p>
+                  </div>
+                  <div class="bookItemEdit col-2 d-flex justify-content-end text-right">
+                    <img class="pencilIcon" src="assets\\icons\\pencil.svg"/>
+                  </div>
+                  <div class="bookItemDelete col-2 d-flex justify-content-end text-right">
+                    <img class="trashIcon" src="assets\\icons\\trash.svg"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        
+        `;
+    }
+
+    //Send the call for books right when the page loads
+    ipcRenderer.send("NeedBooks");
+
+
+    //Click handlers
+    $("#refresh").click(function () {
+      RefreshBooks();
+    });
+
+    $("#btnAdd").click(function () {
+      book = {};
+      book.BookName = $("#inputBookName").val();
+      book.BookAuthor = $("#inputBookAuthor").val();
+      book.BookImage = $("#inputBookImage").val();
+      ipcRenderer.send("AddBook", book);
+      prepForRefresh();
+      $("#inputBookName").val("");
+      $("#inputBookAuthor").val("");
+      $("#inputBookImage").val("");
+    });
+
+    $("#btnSaveEdit").click(function () {
+      book = {};
+      book.PrimaryKey = selectedID;
+      book.BookName = $("#inputEditBookName").val();
+      book.BookAuthor = $("#inputEditBookAuthor").val();
+      book.BookImage = $("#inputEditBookImage").val();
+      ipcRenderer.send("EditBook", book);
+      prepForRefresh();
+      $("#inputEditBookName").val("");
+      $("#inputEditBookAuthor").val("");
+      $("#inputEditBookImage").val("");
+    });
+
+
+    //This type of handler watches the entire document for events
+    //Required for elements that are added/removed dynamically
+    $(document).on('click', '.bookItemEdit', function () {
+      selectedID = $(this).closest(".bookItem").attr('id');
+      console.log("clicked: " + selectedID);
+
+      var book = {};
+      for (var i = 0; i < savedList.length; i++) {
+        if (savedList[i].PrimaryKey == selectedID) {
+          book = savedList[i];
+          break;
+        }
+      }
+      console.log(book);
+      if (book == null) {
+        return;
+      }
+      $("#inputEditBookName").val(book.BookName);
+      $("#inputEditBookAuthor").val(book.BookAuthor);
+      $("#inputEditBookImage").val(book.BookImage);
+
+      //Code to attach the boostrap 5 modal and show it
+      var myModal = new bootstrap.Modal(document.getElementById('modalEditBook'));
+      myModal.show();
+    });
+
+    $(document).on('click', '.bookItemDelete', function () {
+      selectedID = $(this).closest(".bookItem").attr('id');
+      console.log("clicked: " + selectedID);
+      console.log('delete')
+      
+      var book = {};
+      for (var i = 0; i < savedList.length; i++) {
+        if (savedList[i].PrimaryKey == selectedID) {
+          book = savedList[i];
+          break;
+        }
+      }
+      console.log(book);
+      if (book == null) {
+        return;
+      }
+
+      ipcRenderer.send("DeleteBook", book);
+      RefreshBooks();
+    });
+
+    //Handler for when the books are sent by the backend
+    ipcRenderer.on("HeresBooks", function (e, bookList) {
+      console.log(bookList)
+      if (bookList.Item) books = bookList.Item
+      var books = bookList.Items;
+      $("#bookList").empty();
+      savedList = books;
+      jQuery.each(books, function (i, val) {
+        $("#bookList").append(
+          returnBookRow(val.BookName, val.BookAuthor, val.BookImage, val.PrimaryKey)
+        );
+      });
+      $("#spinner").fadeOut(250, function () {
+        $("#hide-on-start").fadeIn(500, function () { });
+      });
+    });
+
+    //Live search functionality
+    $("#txt-search").keyup(function () {
+      var searchField = $(this).val();
+      if (searchField == "") {
+        console.log("empty");
+        $("#bookList").empty();
+        jQuery.each(savedList, function (i, val) {
+          $("#bookList").append(
+            returnBookRow(val.BookName, val.BookAuthor, val.BookImage, val.PrimaryKey)
+          );
+        });
+        return;
+      }
+      var regex = new RegExp(searchField, "i");
+      var count = 1;
+      var output = "";
+      $.each(savedList, function (key, val) {
+        if (
+          val.BookName.search(regex) != -1 ||
+          val.BookAuthor.search(regex) != -1
+        ) {
+          output += returnBookRow(
+            val.BookName,
+            val.BookAuthor,
+            val.BookImage,
+            val.PrimaryKey
+          );
+        }
+      });
+      $("#bookList").empty();
+      $("#bookList").html(output);
+    });
+
+    //Shoes the spinner & calls for books
+    function RefreshBooks() {
+      $("#hide-on-start").hide();
+      $("#spinner").fadeIn(250, function () {
+        ipcRenderer.send("NeedBooks");
+      });
+    }
+
+    //Shows the spinner while loading books
+    function prepForRefresh() {
+      $("#hide-on-start").hide();
+      $("#spinner").fadeIn(250, function () {
+      });
+    }
+
+    //Initialize Bootstrap 5 tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  </script>
+</body>
+
+</html>

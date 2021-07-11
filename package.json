@@ -1,0 +1,27 @@
+{
+  "name": "my-electron-app",
+  "version": "1.0.0",
+  "description": "Test Electron App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "serve": "cross-env LIVE_RELOAD=true nodemon --watch * --exec \"electron .\"",
+    "preconfig": "npm i global-agent cross-env --ignore-scripts",
+    "preinstall": "npm install electron"
+  },
+  "author": "Alissa Vining",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.13.1",
+    "aws-sdk": "^2.892.0",
+    "chokidar": "^3.5.1",
+    "cross-env": "^7.0.3",
+    "electron": "^13.1.6",
+    "global-agent": "^2.2.0",
+    "nodemon": "^2.0.7",
+    "proxy-agent": "^4.0.1",
+    "request": "^2.88.2",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {}
+}
