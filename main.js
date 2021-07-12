@@ -8,8 +8,8 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 if (process.env.LIVE_RELOAD == "true") require("./modules/reload")(__dirname);
 
 let aws = new $AWS(
-    "AKIA4US7MEW7BUKOFLU7",
-    "QdYKyQnoIJ/3PZ9tRMWJxObiYfrEC1SJ3euGGnVc"
+    "",
+    ""
 )
 
 var mainWindow;
