@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap CSS -->
+  <link href="assets\css\bootstrap.min.css" rel="stylesheet" />
+  <link href="assets\css\styles.css" rel="stylesheet" />
+  <script>
+    window.$ = window.jQuery = require("./assets/js/jquery-3.6.0.min.js");
+  </script>
+
+  <title>TEST Craftstore</title>
+</head>
+
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid pr-0 mr-0" style="padding-right:0">
+      <div class="row w-100 pr-0 mr-0" style="padding-right:0">
+        <div class="col-4 d-flex justify-content-start align-items-center">
+          <button type="button" class="btn btn-primary" style="margin-right: 5px; margin-left:5px;" onclick="relocateCrafts()">Craftstore</button>
+          <button type="button" class="btn btn-primary" style="margin-right: 5px; margin-left:5px;" onclick="relocateCrafts()">Crafts</button>
+        </div>
+        <div class="col-8 pr-0 mr-0- d-flex justify-content-end" style="padding-right:0">
+          <div data-bs-toggle="tooltip" data-bs-placement="bottom" title="Refresh Crafts">
+            <a href="#" id="refresh">
+              <img class="navIcon" src="assets\\icons\\arrow-clockwise.svg" /></a>
+          </div>
+          <div class="mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add Craft">
+            <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              <img class="navIcon" src="assets\\icons\\plus.svg" /></a>
+            </a>
+          </div>
+          <div data-bs-toggle="tooltip" data-bs-placement="bottom" title="Log Out">
+            <a href="login.html">
+              <img class="navIcon" src="assets\\icons\\lock.svg" /></a>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container-flex">
+    <div class="row my-3 d-flex justify-content-center align-items-center">
+      <div class="col-10">
+        <input type="input" class="form-control input-lg" id="txt-search" placeholder="Search for Crafts" />
+
+      </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div id="spinner" class="w-100 h-75 row align-items-center">
+      <div class="d-flex justify-content-center flex-row">
+        <div class="d-flex justify-content center align-items-center flex-column">
+          <div class="spinner-border" role="status">
+            <span class="sr-only"></span>
+          </div>
+          <div class="my-3"><strong>Loading...</strong></div>
+        </div>
+      </div>
+    </div>
+    <div id="hide-on-start" style="display:none">
+      <div class="container-flex d-flex justify-content-center flex-column align-items-center">
+        <div class="row p-0 m-0 h-100 w-100 justify-content-center flex-row align-items-center" id="CraftList"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!--
+
+Modals
+
+-->
+
+  <!-- Add Craft Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Craft</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label for="inputCraftName" class="form-label">Craft Name</label>
+            <input type="text" id="inputCraftName" placeholder="Craft Name" class="form-control" /></div>
+          <div class="mb-3"><label for="inputCraftSupplies" class="form-label">Supplies</label>
+            <input type="text" id="inputCraftSupplies" placeholder="Supplies" class="form-control" /></div>
+          <div class="mb-3"><label for="inputCraftDescription" class="form-label">Description</label>
+            <input type="text" id="inputCraftDescription" placeholder="Description" class="form-control" /></div>
+        <div class="mb-3"><label for="inputCraftImage" class="form-label">Image URL</label>
+            <input type="text" id="inputCraftImage" placeholder="Image URL" class="form-control" /></div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close
+          </button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="btnAdd">
+            Save changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Edit Craft Modal -->
+  <div class="modal fade" id="modalEditCraft" tabindex="-1" aria-labelledby="modalEditCraft" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalEditCraftLabel">Edit Craft</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label for="inputEditCraftName" class="form-label">Craft Name</label>
+            <input type="text" id="inputEditCraftName" placeholder="Craft Name" class="form-control" /></div>
+          <div class="mb-3"><label for="inputEditCraftSupplies" class="form-label">Supplies</label>
+            <input type="text" id="inputEditCraftSupplies" placeholder="Supplies" class="form-control" /></div>
+          <div class="mb-3"><label for="inputEditCraftDescription" class="form-label">Description</label>
+            <input type="text" id="inputEditCraftDescription" placeholder="Description" class="form-control" /></div>
+        <div class="mb-3"><label for="inputEditCraftImage" class="form-label">Image URL</label>
+            <input type="text" id="inputEditCraftImage" placeholder="Image URL" class="form-control" /></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close
+          </button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="btnSaveEdit">
+            Save changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="assets\js\bootstrap.bundle.min.js"></script>
+  <script>
+    //Required electron includes
+    const electron = require("electron");
+    const { ipcRenderer } = electron;
+
+    //Initialize empty object to store items - used for live search
+    var savedList = {};
+    //Stores the ID of the selected Craft
+    var selectedID = "";
+
+    //Generates html for cards for the Crafts
+    function returnCraftRow(CraftName, CraftSupplies, CraftDescription, CraftImage, CraftID) {
+      return `     
+        <div class="card col-xs-10 col-sm-10 col-md-4 col-lg-3 col-xl-2 mb-3 mx-3 CraftItem" id="${CraftID}" style="height:300px;">
+            <div class="d-flex justify-content-center align-items-center pt-2"><img src="${CraftImage}" class="card-img-top" style="width:150px;height:auto;" alt="..."></div>
+
+              <div class="card-body d-flex flex-column justify-content-around">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-10 text-center">
+                        <h4 class="justify-content-center card-title row">${CraftName}</h4>
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-8 p-0 m-0 d-flex justify-content-start align-items-center">
+                        <p class="card-text p-0 m-0">${CraftSupplies}</p>
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-8 p-0 m-0 d-flex justify-content-start align-items-center">
+                        <p class="card-text p-0 m-0">${CraftDescription}</p>
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-center">
+                    <div class="CraftItemEdit col-2 d-flex justify-content-end text-right">
+                        <img class="pencilIcon" src="assets\\icons\\pencil.svg"/>
+                    </div>
+                    <div class="CraftItemDelete col-2 d-flex justify-content-end text-right">
+                        <img class="trashIcon" src="assets\\icons\\trash.svg"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        `;
+    }
+
+    //Send the call for Crafts right when the page loads
+    ipcRenderer.send("NeedCrafts");
+
+    function relocateBooks(){
+      location.href = "./index.html"
+    }
+
+    function relocateCrafts(){
+      location.href = "./craft.html"
+    }
+    
+    //Click handlers
+    $("#refresh").click(function () {
+      RefreshCrafts();
+    });
+
+    $("#btnAdd").click(function () {
+      Craft = {};
+      Craft.CraftName = $("#inputCraftName").val();
+      Craft.CraftSupplies = $("#inputCraftSupplies").val();
+      Craft.CraftDescription = $("#inputCraftDescription").val();
+      Craft.CraftImage = $("#inputCraftImage").val();
+      console.log(Craft.CraftDescription)
+      ipcRenderer.send("AddCraft", Craft);
+      prepForRefresh();
+      $("#inputCraftName").val("");
+      $("#inputCraftSupplies").val("");
+      $("#inputCraftDescription").val("");
+      $("#inputCraftImage").val("");
+    });
+
+    $("#btnSaveEdit").click(function () {
+      Craft = {};
+      Craft.PrimaryKey = selectedID;
+      Craft.CraftName = $("#inputEditCraftName").val();
+      Craft.CraftSupplies = $("#inputEditCraftSupplies").val();
+      Craft.CraftDescription = $("#inputEditCraftDescription").val();
+      Craft.CraftImage = $("#inputEditCraftImage").val();
+      ipcRenderer.send("EditCraft", Craft);
+      prepForRefresh();
+      $("#inputEditCraftName").val("");
+      $("#inputEditCraftSupplies").val("");
+      $("#inputEditCraftDescription").val("");
+      $("#inputEditCraftImage").val("");
+    });
+
+
+    //This type of handler watches the entire document for events
+    //Required for elements that are added/removed dynamically
+    $(document).on('click', '.CraftItemEdit', function () {
+      selectedID = $(this).closest(".CraftItem").attr('id');
+      console.log("clicked: " + selectedID);
+
+      var Craft = {};
+      for (var i = 0; i < savedList.length; i++) {
+        if (savedList[i].PrimaryKey == selectedID) {
+          Craft = savedList[i];
+          break;
+        }
+      }
+      console.log(Craft);
+      if (Craft == null) {
+        return;
+      }
+      $("#inputEditCraftName").val(Craft.CraftName);
+      $("#inputEditCraftSupplies").val(Craft.CraftSupplies);
+      $("#inputEditCraftDescription").val(Craft.CraftDescription);
+      $("#inputEditCraftImage").val(Craft.CraftImage);
+
+      //Code to attach the boostrap 5 modal and show it
+      var myModal = new bootstrap.Modal(document.getElementById('modalEditCraft'));
+      myModal.show();
+    });
+
+    $(document).on('click', '.CraftItemDelete', function () {
+      selectedID = $(this).closest(".CraftItem").attr('id');
+      console.log("clicked: " + selectedID);
+      console.log('delete')
+      
+      var Craft = {};
+      for (var i = 0; i < savedList.length; i++) {
+        if (savedList[i].PrimaryKey == selectedID) {
+          Craft = savedList[i];
+          break;
+        }
+      }
+      console.log(Craft);
+      if (Craft == null) {
+        return;
+      }
+
+      ipcRenderer.send("DeleteCraft", Craft);
+      RefreshCrafts();
+    });
+
+    //Handler for when the Crafts are sent by the backend
+    ipcRenderer.on("HeresCrafts", function (e, CraftList) {
+      console.log(CraftList)
+      if (CraftList.Item) Crafts = CraftList.Item
+      var Crafts = CraftList.Items;
+      $("#CraftList").empty();
+      savedList = Crafts;
+      jQuery.each(Crafts, function (i, val) {
+        $("#CraftList").append(
+          returnCraftRow(val.CraftName, val.CraftSupplies, val.CraftDescription, val.CraftImage, val.PrimaryKey)
+        );
+      });
+      $("#spinner").fadeOut(250, function () {
+        $("#hide-on-start").fadeIn(500, function () { });
+      });
+    });
+
+    //Live search functionality
+    $("#txt-search").keyup(function () {
+      var searchField = $(this).val();
+      if (searchField == "") {
+        console.log("empty");
+        $("#CraftList").empty();
+        jQuery.each(savedList, function (i, val) {
+          $("#CraftList").append(
+            returnCraftRow(val.CraftName, val.CraftSupplies, val.CraftDescription, val.CraftImage, val.PrimaryKey)
+          );
+        });
+        return;
+      }
+      var regex = new RegExp(searchField, "i");
+      var count = 1;
+      var output = "";
+      $.each(savedList, function (key, val) {
+        if (
+          val.CraftName.search(regex) != -1 ||
+          val.CraftSupplies.search(regex) != -1
+        ) {
+          output += returnCraftRow(
+            val.CraftName,
+            val.CraftSupplies,
+            val.CraftDescription,
+            val.CraftImage,
+            val.PrimaryKey
+          );
+        }
+      });
+      $("#CraftList").empty();
+      $("#CraftList").html(output);
+    });
+
+    //Shoes the spinner & calls for Crafts
+    function RefreshCrafts() {
+      $("#hide-on-start").hide();
+      $("#spinner").fadeIn(250, function () {
+        ipcRenderer.send("NeedCrafts");
+      });
+    }
+
+    //Shows the spinner while loading Crafts
+    function prepForRefresh() {
+      $("#hide-on-start").hide();
+      $("#spinner").fadeIn(250, function () {
+      });
+    }
+
+    //Initialize Bootstrap 5 tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  </script>
+</body>
+
+</html>

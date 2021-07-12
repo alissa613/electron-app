@@ -22,8 +22,8 @@
     <div class="container-fluid pr-0 mr-0" style="padding-right:0">
       <div class="row w-100 pr-0 mr-0" style="padding-right:0">
         <div class="col-4 d-flex justify-content-start align-items-center">
-          <button type="button" class="btn btn-primary" style="margin-right: 5px; margin-left:5px;" onclick="alert('Hello World!')">Bookstore</button>
-          <button type="button" class="btn btn-primary" style="margin-right: 5px; margin-left:10px;" onclick="alert('Goodbye World!')">New Tab</button>
+          <button type="button" class="btn btn-primary" style="margin-right: 5px; margin-left:5px;" onclick="relocateBooks()">Bookstore</button>
+          <button type="button" class="btn btn-primary" style="margin-right: 5px; margin-left:5px;" onclick="relocateCrafts()">Crafts</button>
         </div>
         <div class="col-8 pr-0 mr-0- d-flex justify-content-end" style="padding-right:0">
           <div data-bs-toggle="tooltip" data-bs-placement="bottom" title="Refresh Books">
@@ -177,7 +177,14 @@ Modals
     //Send the call for books right when the page loads
     ipcRenderer.send("NeedBooks");
 
+    function relocateBooks(){
+      location.href = "./index.html"
+    }
 
+    function relocateCrafts(){
+      location.href = "./craft.html"
+    }
+    
     //Click handlers
     $("#refresh").click(function () {
       RefreshBooks();
